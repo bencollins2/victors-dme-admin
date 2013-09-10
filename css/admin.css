@@ -196,6 +196,9 @@ form h2 {
     font-style: italic;
     font-size: 12px;
     border-bottom: thin solid #222;
+    text-indent: -11px;
+    overflow: visible;
+    margin: 0 0 10px 11px;
 }
 
 form h2.cats {
