@@ -11,7 +11,8 @@
 	 return $rs;
 	}
 
-	define('UPLOADPATH', '/Users/tkdman/DME/campaign/img/uploads/');
+	// define('UPLOADPATH', '/Applications/MAMP/htdocs/campaign/img/uploads/');
+	define('UPLOADPATH', '/afs/umich.edu/group/e/engcomm/Private/uploads/img/');
 	// echo (UPLOADPATH);
 
 	if (!extension_loaded('json')) {
@@ -26,6 +27,8 @@
 	$categories = mysql_real_escape_string($_REQUEST["categories"]);
 	$individuals = mysql_real_escape_string($_REQUEST["individuals"]);
 	$sidebar = mysql_real_escape_string($_REQUEST["sidebar"]);
+	$mailimg = mysql_real_escape_string($_REQUEST["mailimg"]);
+
 
 	if ($type == "hideviewed") {
 		$query = "UPDATE `users` SET `showviewed` = '0' WHERE `id` = '$id'";
@@ -55,6 +58,8 @@
 			if ($categories != "") $set .= "`categories` = '$categories',";
 			if ($individuals != "") $set .= "`individuals` = '$individuals',";
 			if ($sidebar != "") $set .= "`sidebar` = '$sidebar',";
+			if ($mailimg != "") $set .= "`mailimg` = '$mailimg',";
+
 
 			$set = substr($set, 0, -1);
 
@@ -73,18 +78,42 @@
 	}
 
 	if ($type == "isdifferent") {
+		header('Content-type: application/json');
 		$query = "SELECT * FROM `users` WHERE id LIKE $id LIMIT 0,1";
 		$result = mysql_query($query) or die("Didn't work.");
 		$arr = recordToArray($result);
 		$msg = "";
-		if ($_REQUEST["first"] !== $arr[0]["first"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
-		if ($_REQUEST["last"] !== $arr[0]["last"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
-		if ($_REQUEST["email"] !== $arr[0]["email"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
-		if ($_REQUEST["categories"] !== $arr[0]["categories"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
-		if ($_REQUEST["individuals"] !== $arr[0]["individuals"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
-		if ($_REQUEST["sidebar"] !== $arr[0]["sidebar"]) $msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+		$return = array();
+		if ($_REQUEST["first"] !== $arr[0]["first"]) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "first";
+		}
+		if ($_REQUEST["last"] !== $arr[0]["last"]) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "last";
+		}
+		if ($_REQUEST["email"] !== $arr[0]["email"]) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "email";
+		}
+		if ($_REQUEST["categories"] !== $arr[0]["categories"]) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "cats";
+			$return["sent"] = $_REQUEST["categories"];
+			$return["sfromDB"] = $arr[0]["categories"];
+		}
+		if ($_REQUEST["individuals"] !== $arr[0]["individuals"] && !($_REQUEST["individuals"] == '0,0,0' && $arr[0] == null)) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "ind";
+		}
+		if ($_REQUEST["sidebar"] !== $arr[0]["sidebar"]) {
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "sidebar";
+		}
+		
+		$return['msg'] = $msg;
 
-		echo $msg;
+		echo json_encode($return);
 	}
 
 	if ($type = "sendmsg") {
@@ -110,9 +139,34 @@
 			$query = "SELECT `timestamp`, `id` FROM messages WHERE id LIKE $insertid LIMIT 0,1";
 			$result = mysql_query($query);
 			$line = mysql_fetch_array($result);
+
 			if ($published == 1) echo $line["timestamp"];
 			else echo $line["id"];
 		}
+	}
+
+	if ($type = "sendreminder") {
+		$mid = (int)$_REQUEST['mid'];
+		$query = "SELECT m.id as 'mid', m.reminders as 'reminders', SUBSTR(m.to, 2) AS 'to', CONCAT(u.first, ' ', u.last) as 'name', CONCAT(a.first, ' ', a.last) as 'adminname', a.email as 'adminemail', u.email as 'email' FROM `messages` as m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` as a ON SUBSTR(m.from, 2) = a.id WHERE m.id LIKE $mid";
+		$result = mysql_query($query);
+		while($line = mysql_fetch_array($result)) {
+		    $message = "Hello $line[name]. <br /><br />$line[adminname] has sent you a new message on the Michigan Engineering Campaign platform. Please <a href='http://engcomm.engin.umich.edu/campaign'>log in</a> to view it.<br /><br />Thanks!";
+			$subject = "New message for Michigan Engineering Campaign";
+			$from = $line["adminname"] . "<$line[adminemail]>";
+			// $headers = "From:" . $from;
+
+			$headers = "From: " . $from . "\n";
+			$headers .= "Reply-To: ". $line['adminemail'] . "\n";
+			$headers = "MIME-Version: 1.0" . "\n";
+			$headers .= "Content-type:text/html;charset=iso-8859-1" . "\n";
+
+			mail($line["email"],$subject,$message,$headers);
+			$rem = $line["reminders"] + 2;
+			echo "Send email notification (" . $rem . ")";
+		}
+
+		$query = "UPDATE `messages` SET `reminders` = `reminders` + 1 WHERE id = $mid";
+		$result = mysql_query($query);
 	}
 
 	if ($_FILES['file']['size'] > 0) {

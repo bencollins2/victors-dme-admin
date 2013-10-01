@@ -15,7 +15,6 @@ li a {
 	color: #222;
 	font-weight: 100;
 	text-decoration: none;
-	border-bottom: thin solid;
 	font-size: 15px;
 }
 
@@ -25,6 +24,10 @@ li.active a {
 
 li a:hover {
     opacity: 1;
+    font-weight: 900;
+}
+
+li a.bold {
     font-weight: 900;
 }
 
@@ -66,6 +69,7 @@ p, p a {
 ul {
     padding: 0;
     margin: 0;
+    position: relative;
 }
 
 li.users {
@@ -86,11 +90,11 @@ li.users:nth-child(even) ul.topic {
 }
 
 ul.topic {
-    display: block;
+    display: inline-block;
     position: relative;
     float: left;
     margin: 10px 2% 10px 0%;
-    width: 46%;
+    width: 98%;
     overflow: hidden;
     padding: 1%;
     background-color: #FFF4CA;
@@ -106,6 +110,11 @@ ul.topic li {
 
 ul.topic li:nth-child(2) {
     clear: left;
+}
+
+ul.topic li.inactive label {
+    color: #84806F;
+    
 }
 
 ul.subtopic {
@@ -165,6 +174,7 @@ form {
     padding: 10px 0 25px;
     margin: 0;
     color: #222;
+    top: 0;
 }
 
 .close {
@@ -195,7 +205,7 @@ form h2 {
     font-weight: 100;
     font-style: italic;
     font-size: 12px;
-    border-bottom: thin solid #222;
+    border-bottom: thin solid #BCAB74;
     text-indent: -11px;
     overflow: visible;
     margin: 0 0 10px 11px;
@@ -218,7 +228,7 @@ a.preview {
     border: none;
     position: relative;
     font-size: 12px;
-    width: 111px;
+    width: 117px;
     margin: 18px 0 0 124px;
 }
 
@@ -315,12 +325,13 @@ img.fromdb {
     max-height: 400px;
     overflow: scroll;
     position: relative;
+    background: #FFFCEF;
 }
 
 .message {}
 
 .message p {
-    margin: 10px 0 10px 25px;
+    margin: 0px 0 0px 25px;
     font-size: 14px;
     font-family: Helvetica, sans-serif;
     font-weight: 100;
@@ -330,6 +341,25 @@ img.fromdb {
 
 .sendmessage {
     margin: 30px 0 0 25px;
+}
+
+.sendemail {
+    display: block;
+    margin: 8px 0 0 25px;
+    font-size: 11px;
+}
+
+.sendemail a {
+    font-size: 11px;
+}
+
+ul li .selectall {
+    font-size: 10px;
+    width: 100%;
+}
+
+ul li .selectall a {
+    font-size: 10px;
 }
 
 input[type="submit"].sendmsg {
@@ -378,6 +408,14 @@ h3.from {
     box-shadow: 0 0 80px rgba(0,0,0,0.1);
 }
 
+.masonry {
+    width: 100%;
+    overflow: auto;
+    position: relative;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 10px;
+}
+
 textarea.storyhtml {
     width: 100%;
     min-height: 400px;
@@ -396,3 +434,35 @@ textarea.storyhtml {
 .message p.attachments a {
     font-size: 14px;
 }
+
+.msgbg {
+    margin: 10px 0 40px;
+    overflow: auto;
+}
+
+.bgimages {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.bgimages li {
+    display: block;
+    position: relative;
+    float: left;
+    margin: 5px;
+    border: thin solid #333;
+    padding: 1px;
+    background-color: white;
+}
+
+.bgimages li a {
+    display: block;
+    position: relative;
+    opacity: .5;
+}
+
+.bgimages li a.solid, .bgimages li a.active {
+    opacity: 1;
+}
+
+.bgimages li a img {}

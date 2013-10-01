@@ -1,9 +1,33 @@
 <?php
 
+require("../db_campaign.php");
+
 // phpinfo();
 
-echo (string)FALSE;
+// echo ord("é");
+// exit;
 
+if (!extension_loaded('json')) {
+        dl('json.so');  
+}
+
+function encode($string) 
+{ 
+	$string = str_replace("&rsquo;", "'", $string);
+	$string = str_replace("&lsquo;", "'", $string);
+	$string = str_replace("&rdquo;", '"', $string);
+	$string = str_replace("&ldquo;", '"', $string);
+	// $string = str_replace("&ndash;", chr(45), $string);
+	// $string = str_replace("&mdash;", chr(226), $string);
+	// $string = str_replace("&aacute;", chr(195), $string);
+	// $string = str_replace("&eacute;", "é", $string);
+	// $string = str_replace("&iacute;", "í", $string);
+	// $string = str_replace("&ntilde;", "ñ", $string);
+	// $string = str_replace("&uacute;", "ú", $string);
+
+
+	return $string;
+}
 
 require "../db_campaign.php";
 include "parsecsv.lib.php";
@@ -66,40 +90,67 @@ if ( $_FILES["filename"]["size"] > 0 ) {
 
 
 	foreach ( $csvdata as $k => $v ) {
-		// $pullquotes = "";
+		$pullquotes = array();
+		$pq = array();
+		if ($v["Pullquote1"] != "") array_push($pq, $v["Pullquote1"]);
+		if ($v["Pullquote2"] != "") array_push($pq, $v["Pullquote2"]);
+		if ($v["Pullquote3"] != "") array_push($pq, $v["Pullquote3"]);
+		if ($v["Pullquote4"] != "") array_push($pq, $v["Pullquote4"]);
+		foreach($pq as $kk => $vv) {
+			$temp = array();
+			$temp["quote"] = mb_convert_encoding(htmlentities($vv, "ENT-QUOTES"), 'HTML-ENTITIES', "auto");
+			$temp["number"] = $kk;
+			$temp["para"] = ($kk+1)+($kk*3);
+			array_push($pullquotes, $temp);
+		}
+		$pullquotes = json_encode($pullquotes, JSON_FORCE_OBJECT);
+
 		$url = $v["Link"];
 		$html = file_get_contents( $url );
-		$content = select_elements("#contentHolder p", $html);
+		$content = select_elements("#contentHolder p .fullWidthImg, #contentHolder p .image-right, #contentHolder p .image-left", $html);
+		$inlineimages = array();
 		foreach ($content as $kk => $vv) {
-			$text = $vv["text"];
-			if (strpos($a,'are') !== false) {
-			    echo 'true';
-			}
-
-			$logic = strpos($text,'About Michigan Engineering: ');
-
-			if ($text != "" && !strpos($text,'About Michigan Engineering: ')) { 
-				echo mb_convert_encoding( $vv["text"], 'HTML-ENTITIES', "auto" );
-				echo "<br /><br />";
-			}
+			$temp = array();
+			$temp["src"] = $vv["attributes"]["src"];
+			$temp["alt"] = $vv["attributes"]["alt"];
+			$temp["title"] = $vv["attributes"]["title"];
+			$temp["para"] = ($kk+1)+($kk*3);
+			array_push($inlineimages, $temp);
 		}
+		$inlineimages = json_encode($inlineimages, JSON_FORCE_OBJECT);
+
+
+		$body = array();
+		$body = explode("\n\n", $v["Body"]);
+		$bodytext = "";
+		foreach($body as $kk => $vv) {
+			$bt = "<p>" . $vv . "</p>";
+			$bt = mb_convert_encoding($bt, "HTML-ENTITIES", "auto");
+			$bt = encode($bt);
+			$bodytext .= $bt;
+		}
+
+		$bodytext = mysql_real_escape_string($bodytext);
+
+		foreach($v as $kk => $vv) {
+			$v[$kk] = mb_convert_encoding($v[$kk], "HTML-ENTITIES", "auto");
+			$v[$kk] = encode($v[$kk]);
+			$v[$kk] = mysql_real_escape_string($v[$kk]);
+		}
+
+
 		// print_r($v);
-		// $query = "INSERT INTO `features` (`title`, `longdesc`, `description`, `img_tall`, `img_large`, `img_med`, `img_sm`, `tags`, `html`, `options`, `customStyle`, `story_images`, `pullquotes`, `weight`) VALUES (NULL, 'Test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', 'test', NULL)";
-
-	echo "******************************<br /><br /><br />";
-
+		// $query = "INSERT INTO `features` (`title`, `longdesc`, `description`, `img_large`, `html`, `pullquotes`) VALUES (\"$v[Deck]\", \"$v[Description]\", \"$v[Subhead]\", \"$v[Image]\", \"$bodytext\", \"$pullquotes\");";
+		
+		$query = "INSERT INTO `features` (`id`, `title`, `byline`, `description`, `longdesc`, `img_large`, `html`, `story_images`, `pullquotes`, `tags`) VALUES (NULL, '$v[Deck]', '$v[Author]', '$v[Subhead]', '$v[Description]', '$v[Image]', '$bodytext', '$inlineimages', '$pullquotes', '$v[Tags]');";
+		echo $query;
+		// $result = mysql_query($query) or die("Didn't work: " . $query);
 	}
 }
 
 ?>
 
-<html>
-<head>
-	<title>File upload</title>
-	<link rel="stylesheet" href="css/import.css">
-</head>
-<body>
-
+		<? if ($query == "") { ?>
 	<div id="main">
 		<h1>Import a CSV file</h1>
 		<form name="main" action="import.php" method="POST" enctype="multipart/form-data">
@@ -108,7 +159,7 @@ if ( $_FILES["filename"]["size"] > 0 ) {
 
 
 		</form>
-	</div>
 
-</body>
-</html>
+	</div>
+<? } ?>
+

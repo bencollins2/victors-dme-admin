@@ -1,20 +1,21 @@
 
 function trackChanges(form) {
 	var post = {};
+	// console.log("Tracking: ", form);
 	post["type"] = "isdifferent";
 	form.find("input[type='text'], input[type='hidden'], textarea").each(function(){
 		$that = $(this);
 		post[$that.attr("name")] = $that.val();
 	});
-	console.log(post);
+	// console.log(post);
 	var request = $.ajax({
 		type: "POST",
 		url: "dostuff.php",
 		data: post
 	});
 	request.done(function(msg) {
-		$(form.find("div.msg")[0]).html(msg);
-		console.log("It's different");
+		$(form.find("div.msg")[0]).html(msg.msg);
+		console.log(msg);
 	});
 	request.fail(function(jqXHR, textStatus) {
 		// console.log( " Failed: " + textStatus );
@@ -59,7 +60,11 @@ function putMessage(e, that){
 			if (returned != "Didn't work.") {
 				if (published == 1) {
 					$pparent = $parent.parent();
-					$("div.message:last").after('<div class="message"><h3 class="from">'+fromname+'</h3><span class="timestamp">'+returned+'</span>'+msg+'</div>');					
+
+					var newmsg = '<div class="message"><h3 class="from">'+fromname+'</h3><span class="timestamp">'+returned+'</span>'+msg+'</div>';
+					$($pparent.find("div.message:last")[0]).after(newmsg);	
+					tinymce.activeEditor.setContent('');	
+					$(".filelist").empty();			
 				}
 				else {
 					window.open("preview.php?id="+returned, "_blank");
@@ -123,7 +128,7 @@ function bindEditStuff(numberOfEntries) {
 			container: id,
 			max_file_size : '10mb',
 			url : 'dostuff.php',
-			resize : {width : 320, height : 240, quality : 90},
+			resize : {width : 960, quality : 90},
 			filters : [
 				{title : "Image files", extensions : "jpg,gif,png"},
 			],
@@ -182,8 +187,11 @@ function bindEditStuff(numberOfEntries) {
 
 	$("a.subtopic").on("click", function(e){
 		e.preventDefault();
+
 		$this = $(this);
-		$this.parent().parent().find("li").slideToggle();
+		$this.parent().parent().find("li").slideToggle(function(){
+
+		});
 		if ($this.css("background-image").indexOf("arrow.png") != -1) {
 			$this.css({"background-image":"url(./img/arrow_down.png)"});
 		}
@@ -191,7 +199,23 @@ function bindEditStuff(numberOfEntries) {
 			$this.css({"background-image":"url(./img/arrow.png)"});
 		}
 
+	});
 
+	//////////////////////
+	// Bind select all //
+	//////////////////////
+
+	$("li.selectall a").on("click", function(e){
+		e.preventDefault();
+		$this = $(this), $parent = $this.parent().parent();
+		$parent.find("input[type='checkbox']").each(function(){
+
+			if (!$(this).attr("disabled") && !$(this).prop("checked")) {
+				// console.log($(this).attr("checked"));
+				$(this).trigger("click");
+			}
+		});
+		trackChanges($($parent.parent().parent().parent()[0]));
 	});
 
 	///////////////////////////////////////
@@ -202,6 +226,7 @@ function bindEditStuff(numberOfEntries) {
 		// e.preventDefault();
 		$this = $(this);
 		$form = $($this.closest("form")[0]);
+		$li = $form.parent();
 		$hidden = $($form.find("input[name='categories']")[0]);
 		var cats = "";
 		$form.find("input[type='checkbox']").each(function(){
@@ -210,7 +235,8 @@ function bindEditStuff(numberOfEntries) {
 		});
 		cats = cats.substring(0, cats.length - 1);
 		$hidden.attr("value", cats);
-		trackChanges($form);
+
+		trackChanges($li);
 	});
 
 	///////////////////////////////
@@ -219,7 +245,8 @@ function bindEditStuff(numberOfEntries) {
 
 	$("li a.user").on("click", function(e){
 		e.preventDefault();
-		that = this;
+		that = this, $that = $(that);
+		$that.toggleClass("bold");
 		$("form").each(function(e){
 
 			if ($(this).parent()[0] != $(that).parent()[0]) $(this).slideUp;
@@ -236,9 +263,9 @@ function bindEditStuff(numberOfEntries) {
 
 	$("input[type='submit'].submit").on("click", function(e){
 		e.preventDefault();
+
 		$this = $(this);
-		$form = $($this.parent()[0]);
-		
+		$form = $($this.parent().parent()[0]);		
 		var post = {};
 		$form.find("input[type='text'], input[type='hidden'], textarea").each(function(){
 			$that = $(this);
@@ -248,10 +275,11 @@ function bindEditStuff(numberOfEntries) {
 		var request = $.ajax({
 			type: "POST",
 			url: "dostuff.php",
-			data: { type: "update", id: post.id, first: post.first, last: post.last, email: post.email, categories: post.categories, individuals: post.individuals, sidebar: post.sidebar }
+			data: { type: "update", id: post.id, first: post.first, last: post.last, email: post.email, categories: post.categories, individuals: post.individuals, sidebar: post.sidebar, mailimg: post.mailimg }
 		});
 		request.done(function(msg) {
 			$($form.find("div.msg")[0]).html(msg);
+			console.log(msg);
 		});
 		request.fail(function(jqXHR, textStatus) {
 
@@ -294,18 +322,88 @@ function bindEditStuff(numberOfEntries) {
 		var csv = "", $this = $(this), $parent = $this.parent(), $li = $parent.parent();
 		$parent.find("select.individual").each(function(k,v){
 			if ($(v).val() != "") csv += $(v).val() + ",";
-			console.log("V: ", $(v).val());
+			// console.log("V: ", $(v).val());
 		});
 		csv = csv.substring(0, csv.length - 1);
 		$($parent.find("input[type='hidden'][name='individuals']")[0]).val(csv);
-		console.log("LI: ", $li);
+		// console.log("LI: ", $li);
 		trackChanges($li);
 
+	});
+
+	/////////////////////////////////
+	// Bind the mail image stuff  //
+	/////////////////////////////////
+
+	$(".msgbg a").on("mouseover", function(e){
+		e.preventDefault();
+		var $this = $(this);
+		$this.addClass("solid");
+	});
+	$(".msgbg a").on("mouseout", function(e){
+		e.preventDefault();
+		var $this = $(this);
+		$this.removeClass("solid");
+	});
+	$(".msgbg a").on("click", function(e){
+		e.preventDefault();
+		var $this = $(this), $parent = $this.parent().parent(), $others = $parent.find("li a"), $hidden = $parent.find("input[type='hidden']");
+		$others.each(function(k,v){
+			$v = $(v);
+			$v.removeClass("active");
+		});
+		$this.toggleClass("active");
+		var newval = $this.attr("id") + ".jpg";
+		$hidden.attr("value", newval);
+	});
+
+	////////////////////////////////////////////
+	// Bind the "Send email reminder" stuff  //
+	////////////////////////////////////////////
+
+	$(".sendemail a").on("click", function(e){
+		e.preventDefault();
+		var $this = $(this), mid = $this.data("mid");
+		var request = $.ajax({
+			type: "POST",
+			url: "dostuff.php",
+			data: { mid: mid, type: "sendreminder" }
+		});
+		request.done(function(msg) {
+			// console.log(msg);
+			$this.html(msg);
+		});
+		request.fail(function(jqXHR, textStatus) {
+			// console.log( " Failed: " + textStatus );
+		});
+	});
+
+}
+
+function deactivateCheckboxes() {
+	$("li input[type='checkbox']").each(function(){
+		$this = $(this);
+		// console.log($this.attr("value"));
+		if (existingCats.indexOf($this.attr("value")) == -1) {
+			$this.attr("disabled", true);
+			$this.parent().addClass("inactive");
+		}
+		else {
+			var $label = $($this.parent().find("label")[0]);
+			$label.css({"cursor":"pointer"});
+			$label.on("click", function(e){
+				e.preventDefault();
+				$this = $(this);
+				$this.parent().find("input[type='checkbox']").click();
+			});
+
+		}
 	});
 }
 
 $(document).ready(function(){
 	bindEditStuff(3);
+	deactivateCheckboxes();
 	$(".messages").animate({ scrollTop: $(this).height() }, 0);
 	$("form").hide();
 	tinymce.init({
@@ -315,7 +413,8 @@ $(document).ready(function(){
 	    "searchreplace visualblocks code fullscreen",
 	    "insertdatetime media table contextmenu paste"
 	  ],
-	  toolbar: "undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link",
+	  toolbar: "undo redo | bold italic | bullist numlist | link",
+	  menubar: false
 	 });
 
 });

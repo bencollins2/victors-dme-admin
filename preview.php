@@ -10,7 +10,7 @@
 	$body = $line["message"];
 
 	$hasimages = false;
-
+  $numimages = 0;
 	$images = array(
 		1 => $line["img1"], 
 		2 => $line["img2"],
@@ -27,6 +27,7 @@
 	$imgurls = array();
 	foreach($images as $k => $v) {
 		if ($v != null) {
+      $numimages++;
 			$hasimages = true;
 			$imgurls[] = $v;
 		}
@@ -191,12 +192,16 @@
 		<h3>Message Preview</h3>
 		<div class="body"><?= $body?></div>
 		<div class="container">
-	    <? if ($hasimages) { ?>
+      <? if ($numimages == 1) {  $imgurls[0] = substr($imgurls[0], 0, -4); ?>
+
+        <img src="imagehelper.php?i=<?= $imgurls[0]?>" alt="Photo 1">
+
+     <? } else if ($hasimages) { ?>
 
 	    <div id="slides">
 
-	    	<? foreach($imgurls as $k => $v) { ?>
-				<img src="http://localhost:8888/htdocs/DME/campaign/img/uploads/<?= $v?>" alt="Photo <? $kk = $k+1; echo $kk?>">
+	    	<? foreach($imgurls as $k => $v) { $v = substr($v, 0, -4);?>
+				<img src="imagehelper.php?i=<?= $v?>" alt="Photo <? $kk = $k+1; echo $kk?>">
 
 			<? } ?>
 
