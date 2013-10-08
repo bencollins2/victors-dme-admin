@@ -117,6 +117,7 @@
                             $categories = $line["categories"];
                             $individuals = $line["individuals"];
                             $sidebar = $line["sidebar"];
+                            $facebook = $line["password"] == "" ? true : false;
                             $cats = array();
                             $cats = explode(",", $categories);
                             $inds = array();
@@ -136,14 +137,17 @@
                                     <h2>Editing <?= $first." ".$last?></h2>
                                     <input type="hidden" name="id" value="<?= $id?>">
 
-                                    <label for="first">First Name</label>
-                                    <input type="text" name="first" value="<?= $first?>"><br>
+                                    <div class="first label">First Name</div>
+                                    <div class="first"><?= $first?></div>
 
-                                    <label for="last">Last Name</label>
-                                    <input type="text" name="last" value="<?= $last?>"><br>
+                                    <div class="last label">Last Name</div>
+                                    <div class="last"><?= $last?></div>
 
-                                    <label for="email">Email</label>
-                                    <input type="text" name="email" value="<?= $email?>"><br>
+                                    <div class="email label">Email</div>
+                                    <div class="email"><?= $email?></div>
+
+                                    <div class="facebook label">Logging in with</div>
+                                    <div class="fb"><?= $facebook ? "<a target='_blank' href='http://www.facebook.com/$id'>Facebook</a>" : "Username/Password" ?></div>
 
                                     <h2 class="cats">Categories</h2>
                                     
@@ -152,7 +156,7 @@
                                         <ul class="topic">
                                             <h3><a href="#" class="subtopic">Transportation Innovations</a></h3> 
                                             <li class="selectall">(<a href="#">Select all</a>)</li>
-                                            <li><input type="checkbox" name="vautonomous" value="vautonomous"<? if (in_array("vautonomous", $cats)) echo " checked";?><? if (in_array("vautonomous", $cats)) echo " checked";?>><label for="vautonomous">Autonomous Vehicles</label></li>
+                                            <li><input type="checkbox" name="vautonomous" value="vautonomous"<? if (in_array("vautonomous", $cats)) echo " checked";?><? if (in_array("vautonomous", $cats)) echo " checked";?>><label class="vautonomous">Autonomous Vehicles</label></li>
                                             <li><input type="checkbox" name="disdriving" value="disdriving"<? if (in_array("disdriving", $cats)) echo " checked";?>><label for="disdriving">Distracted Driving</label></li>
                                             <li><input type="checkbox" name="invehicletech" value="invehicletech"<? if (in_array("invehicletech", $cats)) echo " checked";?>><label for="invehicletech">In-Vehicle Technology</label></li>
                                             <li><input type="checkbox" name="vehiclesafety" value="vehiclesafety"<? if (in_array("vehiclesafety", $cats)) echo " checked";?>><label for="vehiclesafety">Vehicle Safety</label></li>

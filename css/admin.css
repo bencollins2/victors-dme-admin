@@ -159,7 +159,7 @@ h3 a.subtopic {
     transition: all .3s ease;
 }
 
-ul.topic label {
+ul.topic label, ul.topic div.label {
     width: auto;
     float: none;
     display: inline-block;
@@ -236,7 +236,7 @@ input.para {
     width: 30px;
 }
 
-label {
+label, div.label {
     width: 170px;
     float: left;
     text-align: right;
