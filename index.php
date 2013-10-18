@@ -411,11 +411,15 @@
                                                 $imgurls[] = $v;
                                             }
                                         }
+										
+										// check the time interval
+										
+										date_default_timezone_set('America/Detroit');
+										$current_date = new DateTime();
+										$last_reminder = DateTime::createFromFormat('Y-m-d H:i:s',$line2["timestamp"]);
+										$interval = $current_date->diff($last_reminder)->days;
+										
                                         ?>
-
-
-
-
 
                                         <div class="message">
                                             <h3 class="from"><?= $line2["fromName"]. " " . $line2["last"]?></h3>
@@ -425,10 +429,12 @@
                                                 <p class="attachments">This message has attachments. <a target="_blank" href="preview.php?id=<?= $line2['mid']?>">Preview it.</a></p>
                                             <? } $hasimages = false;?>
 
-                                            <? if ($line2["from"] == $aid) { ?> 
-
-                                            <span class="sendemail">(<a href="#" data-mid="<?= $line2['mid']?>">Send email notification (<?= $line2["reminders"] + 1?>)</a>)</span>
-                                            
+                                            <? if ($line2["from"] == $aid) { ?>
+												<?if ($interval > 0) {?> 
+                                            		<span class="sendemail">(<a href="#" data-mid="<?= $line2['mid']?>">Send email notification (<?= $line2["reminders"] + 1?>)</a>)</span>
+												<?}else{?>
+													<span class="sendemail">Reminder sent. Please wait 24 hours before sending again.</span>
+												<? }?>
                                             <? } ?>
 
                                         </div>

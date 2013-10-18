@@ -371,7 +371,7 @@ function bindEditStuff(numberOfEntries) {
 		});
 		request.done(function(msg) {
 			// console.log(msg);
-			$this.html(msg);
+			$this.parent().html('Reminder sent. Please wait 24 hours before sending again.');
 		});
 		request.fail(function(jqXHR, textStatus) {
 			// console.log( " Failed: " + textStatus );
