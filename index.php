@@ -377,7 +377,7 @@
                                     <div class="messages">
                                     
                                     <? 
-                                        $query2 = "SELECT m.id as mid, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2) AS 'to', m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(a.first, ' ', a.last) AS fromName, CONCAT(u.first, ' ', u.last) AS toName, m.reminders as reminders FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.from, 2) = a.id WHERE SUBSTR(m.to, 2) LIKE '$id' AND SUBSTR(m.from, 2) LIKE '$aid' UNION SELECT m.id, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2), m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(u.first, ' ', u.last), CONCAT(a.first, ' ', a.last), m.reminders as reminders FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.from, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.to, 2) = a.id WHERE SUBSTR(m.from, 2) LIKE '$id' AND SUBSTR(m.to, 2) LIKE '$aid' ORDER BY `timestamp` ASC";
+                                        $query2 = "SELECT m.id as mid, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2) AS 'to', m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(a.first, ' ', a.last) AS fromName, CONCAT(u.first, ' ', u.last) AS toName, m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.from, 2) = a.id WHERE SUBSTR(m.to, 2) LIKE '$id' AND SUBSTR(m.from, 2) LIKE '$aid' UNION SELECT m.id, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2), m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(u.first, ' ', u.last), CONCAT(a.first, ' ', a.last), m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.from, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.to, 2) = a.id WHERE SUBSTR(m.from, 2) LIKE '$id' AND SUBSTR(m.to, 2) LIKE '$aid' ORDER BY `timestamp` ASC";
 
                                         $unread = "";
                                         $result2 = mysql_query($query2);
@@ -413,11 +413,15 @@
                                         }
 										
 										// check the time interval
+										if(isset($line2['remindertime'])&&$line2['remindertime']!=NULL&&$line2['remindertime']!=''){
+											date_default_timezone_set('America/Detroit');
+											$current_date = new DateTime();
+											$last_reminder = DateTime::createFromFormat('Y-m-d H:i:s',$line2["remindertime"]);
+											$interval = $current_date->diff($last_reminder)->days;
+										}else{
+											$interval = 1;
+										}
 										
-										date_default_timezone_set('America/Detroit');
-										$current_date = new DateTime();
-										$last_reminder = DateTime::createFromFormat('Y-m-d H:i:s',$line2["timestamp"]);
-										$interval = $current_date->diff($last_reminder)->days;
 										
                                         ?>
 

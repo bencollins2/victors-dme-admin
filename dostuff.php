@@ -164,8 +164,12 @@
 			$rem = $line["reminders"] + 2;
 			echo "Send email notification (" . $rem . ")";
 		}
+		
+		date_default_timezone_set('America/Detroit');
+		$current_date = new DateTime();
+		$current_date = $current_date->format('Y-m-d H:i:s');
 
-		$query = "UPDATE `messages` SET `reminders` = `reminders` + 1 WHERE id = $mid";
+		$query = "UPDATE `messages` SET `reminders` = `reminders` + 1, `remindertime` = '$current_date' WHERE id = $mid";
 		$result = mysql_query($query);
 	}
 
