@@ -90,53 +90,90 @@ if ( $_FILES["filename"]["size"] > 0 ) {
 
 
 	foreach ( $csvdata as $k => $v ) {
-		$pullquotes = array();
-		$pq = array();
-		if ($v["Pullquote1"] != "") array_push($pq, $v["Pullquote1"]);
-		if ($v["Pullquote2"] != "") array_push($pq, $v["Pullquote2"]);
-		if ($v["Pullquote3"] != "") array_push($pq, $v["Pullquote3"]);
-		if ($v["Pullquote4"] != "") array_push($pq, $v["Pullquote4"]);
-		foreach($pq as $kk => $vv) {
-			$temp = array();
-			$temp["quote"] = mb_convert_encoding(htmlentities($vv, "ENT-QUOTES"), 'HTML-ENTITIES', "auto");
-			$temp["number"] = $kk;
-			$temp["para"] = ($kk+1)+($kk*3);
-			array_push($pullquotes, $temp);
+		$aa = $v["Deck"];
+		$aalink = $v["Link"];
+		if (strtoupper($v["Type"]) == "STORY") {
+			$pullquotes = array();
+			$pq = array();
+			if ($v["Pullquote1"] != "") array_push($pq, $v["Pullquote1"]);
+			if ($v["Pullquote2"] != "") array_push($pq, $v["Pullquote2"]);
+			if ($v["Pullquote3"] != "") array_push($pq, $v["Pullquote3"]);
+			if ($v["Pullquote4"] != "") array_push($pq, $v["Pullquote4"]);
+			foreach($pq as $kk => $vv) {
+				$temp = array();
+				$temp["quote"] = mb_convert_encoding(htmlentities($vv, "ENT-QUOTES"), 'HTML-ENTITIES', "auto");
+				$temp["number"] = $kk;
+				$temp["para"] = ($kk+1)+($kk*3);
+				array_push($pullquotes, $temp);
+			}
+			$pullquotes = json_encode($pullquotes, JSON_FORCE_OBJECT);
+
+			$url = $v["Link"];
+
+			$jsonurl = $url . "/dmejson";
+
+			$json = json_decode(file_get_contents( $jsonurl ) );
+			// $content = select_elements("#contentHolder p .fullWidthImg, #contentHolder p .image-right, #contentHolder p .image-left", $html);
+			
+
+			//////////////////////////////
+			// Check each paragraph tag //
+			//////////////////////////////
+			// $content = select_elements("#contentHolder img", $html);
+
+			$inlineimages = array();
+			foreach ($content as $kk => $vv) {
+				
+				//////////////////////////////////////////
+				// and see if there are child images..  //
+				//////////////////////////////////////////
+				// foreach($vv['children'] as $kkk => $vvv) {
+					// $type = $vvv['name'];
+					// if ($type == "img") {
+						$temp = array();
+						$temp["src"] = $vv["attributes"]["src"];
+						$temp["alt"] = $vv["attributes"]["alt"];
+						$temp["title"] = $vv["attributes"]["title"];
+						$temp["para"] = $kk*$kk;
+						array_push($inlineimages, $temp);
+					// }
+				// }
+			}
+			$inlineimages = json_encode($inlineimages, JSON_FORCE_OBJECT);
+
+
+			$content = select_elements("#contentHolder .contentBlock .innerShadow", $html);
+			
+			$body = array();
+			$bodytext = "";	
+			$tmp = $content[0]['children'];	
+			
+			foreach ($tmp as $kk => $vv) {
+				$test = $vv;
+			}
 		}
-		$pullquotes = json_encode($pullquotes, JSON_FORCE_OBJECT);
-
-		$url = $v["Link"];
-		$html = file_get_contents( $url );
-		$content = select_elements("#contentHolder p .fullWidthImg, #contentHolder p .image-right, #contentHolder p .image-left", $html);
-		$inlineimages = array();
-		foreach ($content as $kk => $vv) {
-			$temp = array();
-			$temp["src"] = $vv["attributes"]["src"];
-			$temp["alt"] = $vv["attributes"]["alt"];
-			$temp["title"] = $vv["attributes"]["title"];
-			$temp["para"] = ($kk+1)+($kk*3);
-			array_push($inlineimages, $temp);
-		}
-		$inlineimages = json_encode($inlineimages, JSON_FORCE_OBJECT);
+		
 
 
-		$body = array();
-		$body = explode("\n\n", $v["Body"]);
-		$bodytext = "";
-		foreach($body as $kk => $vv) {
-			$bt = "<p>" . $vv . "</p>";
-			$bt = mb_convert_encoding($bt, "HTML-ENTITIES", "auto");
-			$bt = encode($bt);
-			$bodytext .= $bt;
-		}
 
-		$bodytext = mysql_real_escape_string($bodytext);
+		// $body = array();
+		// $body = explode("\n\n", $v["Body"]);
+		// $bodytext = "";
 
-		foreach($v as $kk => $vv) {
-			$v[$kk] = mb_convert_encoding($v[$kk], "HTML-ENTITIES", "auto");
-			$v[$kk] = encode($v[$kk]);
-			$v[$kk] = mysql_real_escape_string($v[$kk]);
-		}
+		// foreach($body as $kk => $vv) {
+		// 	$bt = "<p>" . $vv . "</p>";
+		// 	$bt = mb_convert_encoding($bt, "HTML-ENTITIES", "auto");
+		// 	$bt = encode($bt);
+		// 	$bodytext .= $bt;
+		// }
+
+		// $bodytext = mysql_real_escape_string($bodytext);
+
+		// foreach($v as $kk => $vv) {
+		// 	$v[$kk] = mb_convert_encoding($v[$kk], "HTML-ENTITIES", "auto");
+		// 	$v[$kk] = encode($v[$kk]);
+		// 	$v[$kk] = mysql_real_escape_string($v[$kk]);
+		// }
 
 
 		// print_r($v);
