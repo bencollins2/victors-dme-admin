@@ -3,11 +3,11 @@ function trackChanges(form) {
 	var post = {};
 	// console.log("Tracking: ", form);
 	post["type"] = "isdifferent";
-	form.find("input[type='text'], input[type='hidden'], textarea").each(function(){
+	form.find("input[type='text'], input[type='hidden'], textarea, input[name='msgslice']").each(function(){
 		$that = $(this);
 		post[$that.attr("name")] = $that.val();
 	});
-	// console.log(post);
+	 console.log(post);
 	var request = $.ajax({
 		type: "POST",
 		url: "dostuff.php",
@@ -208,7 +208,7 @@ function bindEditStuff(numberOfEntries) {
 	$("li.selectall a").on("click", function(e){
 		e.preventDefault();
 		$this = $(this), $parent = $this.parent().parent();
-		$parent.find("input[type='checkbox']").each(function(){
+		$parent.find(".masonry5 input[type='checkbox']").each(function(){
 
 			if (!$(this).attr("disabled") && !$(this).prop("checked")) {
 				// console.log($(this).attr("checked"));
@@ -222,14 +222,14 @@ function bindEditStuff(numberOfEntries) {
 	// Bind the clicking of a checkbox  //
 	///////////////////////////////////////
 
-	$("input[type='checkbox']").on("click", function(e){
+	$(".masonry5 input[type='checkbox']").on("click", function(e){
 		// e.preventDefault();
 		$this = $(this);
 		$form = $($this.closest("form")[0]);
 		$li = $form.parent();
 		$hidden = $($form.find("input[name='categories']")[0]);
 		var cats = "";
-		$form.find("input[type='checkbox']").each(function(){
+		$form.find(".masonry5 input[type='checkbox']").each(function(){
 			$that = $(this);
 			if ($that.is(":checked")) cats += $that.attr("value") + ",";
 		});
@@ -238,6 +238,8 @@ function bindEditStuff(numberOfEntries) {
 
 		trackChanges($li);
 	});
+	
+	
 
 	///////////////////////////////
 	// Bind the username click  //
@@ -267,15 +269,15 @@ function bindEditStuff(numberOfEntries) {
 		$this = $(this);
 		$form = $($this.parent().parent()[0]);		
 		var post = {};
-		$form.find("input[type='text'], input[type='hidden'], textarea").each(function(){
+		$form.find("input[type='text'], input[type='hidden'], textarea, input[name='msgslice']").each(function(){
 			$that = $(this);
 			post[$that.attr("name")] = $that.val();
 		});
-
+		
 		var request = $.ajax({
 			type: "POST",
 			url: "dostuff.php",
-			data: { type: "update", id: post.id, first: post.first, last: post.last, email: post.email, categories: post.categories, individuals: post.individuals, sidebar: post.sidebar, mailimg: post.mailimg }
+			data: { type: "update", id: post.id, first: post.first, last: post.last, email: post.email, categories: post.categories, individuals: post.individuals, sidebar: post.sidebar, mailimg: post.mailimg, msgslice: post.msgslice }
 		});
 		request.done(function(msg) {
 			$($form.find("div.msg")[0]).html(msg);
@@ -330,6 +332,17 @@ function bindEditStuff(numberOfEntries) {
 		trackChanges($li);
 
 	});
+	
+	$("input[name='msgslice']").on("click", function(e){
+		//e.preventDefault();
+		$li = $(this).parent().parent();
+		if(this.checked){
+			$(this).val(0);
+		}else{
+			$(this).val(1);
+		}
+		trackChanges($li);
+	});
 
 	/////////////////////////////////
 	// Bind the mail image stuff  //
@@ -381,7 +394,7 @@ function bindEditStuff(numberOfEntries) {
 }
 
 function deactivateCheckboxes() {
-	$("li input[type='checkbox']").each(function(){
+	$(".masonry5 li input[type='checkbox']").each(function(){
 		$this = $(this);
 		// console.log($this.attr("value"));
 		if (existingCats.indexOf($this.attr("value")) == -1) {
@@ -394,7 +407,7 @@ function deactivateCheckboxes() {
 			$label.on("click", function(e){
 				e.preventDefault();
 				$this = $(this);
-				$this.parent().find("input[type='checkbox']").click();
+				$this.parent().find(".masonry5 input[type='checkbox']").click();
 			});
 
 		}

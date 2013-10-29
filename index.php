@@ -122,6 +122,7 @@
                             $cats = explode(",", $categories);
                             $inds = array();
                             $inds = explode(",", $individuals);
+							$msgslice = $line["show_message_slice"];
 
                     ?>
                         
@@ -349,6 +350,7 @@
 
                                         ?>
                                     </select> <br />
+									<label>Message Slice</label><input type="checkbox" name="msgslice" <? if($msgslice==='0') echo "checked value='0'" ?>><label style="float:none;"> Hide the message slice.</label><br />
 
                                     <input type="hidden" name="individuals" value="<?= $individuals?>"><br>
 

@@ -28,6 +28,7 @@
 	$individuals = mysql_real_escape_string($_REQUEST["individuals"]);
 	$sidebar = mysql_real_escape_string($_REQUEST["sidebar"]);
 	$mailimg = mysql_real_escape_string($_REQUEST["mailimg"]);
+	$msgslice = mysql_real_escape_string($_REQUEST["msgslice"]);
 
 
 	if ($type == "hideviewed") {
@@ -59,6 +60,7 @@
 			if ($individuals != "") $set .= "`individuals` = '$individuals',";
 			if ($sidebar != "") $set .= "`sidebar` = '$sidebar',";
 			if ($mailimg != "") $set .= "`mailimg` = '$mailimg',";
+			if ($msgslice != "") $set .="`show_message_slice` = '$msgslice',";
 
 
 			$set = substr($set, 0, -1);
@@ -109,6 +111,10 @@
 		if ($_REQUEST["sidebar"] !== $arr[0]["sidebar"]) {
 			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
 			$return["from"] = "sidebar";
+		}
+		if ($_REQUEST["msgslice"] !== $arr[0]["show_message_slice"]){
+			$msg = "<span style='color: #ff0000'>Unsaved changes!</span>";
+			$return["from"] = "msgslice";
 		}
 		
 		$return['msg'] = $msg;
