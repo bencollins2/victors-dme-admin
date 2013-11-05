@@ -245,6 +245,7 @@ label, div.label {
     font-weight: 100;
     font-size: 13px;
     line-height: 1.3em;
+    clear: both;
 }
 
 label.file {
@@ -257,6 +258,11 @@ label.checkbox {
     float: none;
     font-size: 12px;
     clear: both;
+}
+
+div.edititem {
+    position:relative;
+    float:left;
 }
 
 input {

@@ -38,6 +38,7 @@
     }
 
     $query = "SELECT * FROM `users`$where$limit";
+    echo "<!--Query : $query -->";
     $result = mysql_query($query) or die("Fail: " . $query);   
 
 
@@ -113,6 +114,7 @@
                             $id = $line["id"];
                             $first = $line["first"];
                             $last = $line["last"];
+                            $name = $line["name"];
                             $email = $line["email"];
                             $categories = $line["categories"];
                             $individuals = $line["individuals"];
@@ -126,7 +128,7 @@
 
                     ?>
                         
-                            <li class="users" id="<?= $id?>"><a class="user" href="#" data-id="<?= $id ?>" data-type="edit"><?= $first." ".$last?></a>
+                            <li class="users" id="<?= $id?>"><a class="user" href="#" data-id="<?= $id ?>" data-type="edit"><?= $name?></a>
                                 <div class="msg"><? 
                                     if ($line['showreplied'] == 1) { ?>
                                     <span style='color: #866DAB'>Prospect has replied to message [<a href="#" class="hidereplied">x</a>]</span><?}
@@ -138,17 +140,17 @@
                                     <h2>Editing <?= $first." ".$last?></h2>
                                     <input type="hidden" name="id" value="<?= $id?>">
 
-                                    <div class="first label">First Name</div>
-                                    <div class="first"><?= $first?></div>
+                                    <div class="first label">First Name:</div>
+                                    <div class="edititem first"><?= $first?></div>
 
-                                    <div class="last label">Last Name</div>
-                                    <div class="last"><?= $last?></div>
+                                    <div class="last label">Last Name:</div>
+                                    <div class="edititem last"><?= $last?></div>
 
-                                    <div class="email label">Email</div>
-                                    <div class="email"><?= $email?></div>
+                                    <div class="email label">Email:</div>
+                                    <div class="edititem email"><?= $email?></div>
 
-                                    <div class="facebook label">Logging in with</div>
-                                    <div class="fb"><?= $facebook ? "<a target='_blank' href='http://www.facebook.com/$id'>Facebook</a>" : "Username/Password" ?></div>
+                                    <div class="facebook label">Logging in with:</div>
+                                    <div class="edititem fb"><?= $facebook ? "<a target='_blank' href='http://www.facebook.com/$id'>Facebook</a>" : "Username/Password" ?></div>
 
                                     <h2 class="cats">Categories</h2>
                                     
@@ -287,6 +289,27 @@
                                             <li><input type="checkbox" name="nostalgia" value="nostalgia"<? if (in_array("nostalgia", $cats)) echo " checked";?>><label for="nostalgia">Nostalgia & Pride</label></li>
                                             <li><input type="checkbox" name="lifeinaa" value="lifeinaa"<? if (in_array("lifeinaa", $cats)) echo " checked";?>><label for="lifeinaa">Life in Ann Arbor</label></li>
                                         </ul>
+                                        <ul class="topic">
+                                            <h3><a href="#" class="subtopic">By Region</a></h3>
+                                            <li class="selectall">(<a href="#">Select all</a>)</li>
+                                            <li><input type="checkbox" name="asia" value="asia"<? if (in_array("asia", $cats)) echo " checked";?>><label for="asia">Asia</label></li>
+                                            <li><input type="checkbox" name="africa" value="africa"<? if (in_array("africa", $cats)) echo " checked";?>><label for="africa">Africa</label></li>
+                                            <li><input type="checkbox" name="australia" value="australia"<? if (in_array("australia", $cats)) echo " checked";?>><label for="australia">Australia</label></li>
+                                            <li><input type="checkbox" name="europe" value="europe"<? if (in_array("europe", $cats)) echo " checked";?>><label for="europe">Europe</label></li>
+                                            <li><input type="checkbox" name="northamerica" value="northamerica"<? if (in_array("northamerica", $cats)) echo " checked";?>><label for="northamerica">North America</label></li>
+                                            <li><input type="checkbox" name="southamerica" value="southamerica"<? if (in_array("southamerica", $cats)) echo " checked";?>><label for="southamerica">South America</label></li>
+                                            <li><input type="checkbox" name="unitedstates" value="unitedstates"<? if (in_array("unitedstates", $cats)) echo " checked";?>><label for="unitedstates">United States</label></li>
+                                            <li><input type="checkbox" name="eastcoast" value="eastcoast"<? if (in_array("eastcoast", $cats)) echo " checked";?>><label for="eastcoast">East Coast</label></li>
+                                            <li><input type="checkbox" name="midwest" value="midwest"<? if (in_array("midwest", $cats)) echo " checked";?>><label for="midwest">Midwest</label></li>
+                                            <li><input type="checkbox" name="south" value="south"<? if (in_array("south", $cats)) echo " checked";?>><label for="south">South</label></li>
+                                            <li><input type="checkbox" name="westcoast" value="westcoast"<? if (in_array("westcoast", $cats)) echo " checked";?>><label for="westcoast">West Coast</label></li>
+                                            <li><input type="checkbox" name="michigan" value="michigan"<? if (in_array("michigan", $cats)) echo " checked";?>><label for="michigan">Michigan</label></li>
+                                            <li><input type="checkbox" name="annarbor" value="annarbor"<? if (in_array("annarbor", $cats)) echo " checked";?>><label for="annarbor">Ann Arbor</label></li>
+                                            <li><input type="checkbox" name="eastmichigan" value="eastmichigan"<? if (in_array("eastmichigan", $cats)) echo " checked";?>><label for="eastmichigan">East Michigan</label></li>
+                                            <li><input type="checkbox" name="northmichigan" value="northmichigan"<? if (in_array("northmichigan", $cats)) echo " checked";?>><label for="northmichigan">North Michigan</label></li>
+                                            <li><input type="checkbox" name="southmichigan" value="southmichigan"<? if (in_array("southmichigan", $cats)) echo " checked";?>><label for="southmichigan">South Michigan</label></li>
+                                            <li><input type="checkbox" name="westmichigan" value="westmichigan"<? if (in_array("westmichigan", $cats)) echo " checked";?>><label for="westmichigan">West Michigan</label></li>
+                                        </ul>
                                     </div>
 
                                     <input type="hidden" name="categories" value="<?= $categories?>">
@@ -350,7 +373,7 @@
 
                                         ?>
                                     </select> <br />
-									<label>Message Slice</label><input type="checkbox" name="msgslice" <? if($msgslice==='0') echo "checked value='0'" ?>><label style="float:none;"> Hide the message slice.</label><br />
+									<label>Message Slice</label><input type="checkbox" name="msgslice" <? if($msgslice==='0') echo "checked value='0'" ?>><label style="float:none;"> Show the message slice.</label><br />
 
                                     <input type="hidden" name="individuals" value="<?= $individuals?>"><br>
 
