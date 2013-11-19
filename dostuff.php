@@ -19,7 +19,7 @@
             dl('json.so');  
     }
     include("../db_campaign.php");
-    $id = (int)$_REQUEST["id"];
+    $id = mysql_real_escape_string($_REQUEST["id"]);
 	$type = mysql_real_escape_string($_REQUEST["type"]);
 	$first = mysql_real_escape_string($_REQUEST["first"]);
 	$last = mysql_real_escape_string($_REQUEST["last"]);
@@ -67,7 +67,7 @@
 
 			$set .= " WHERE `id` LIKE $id";
 			$result = mysql_query($query.$set) or die("Didn't work.");
-			echo "<span style='color: #266F26'>Changes saved.</span>";
+			echo "<span class='$categories' style='color: #266F26'>Changes saved.</span>";
 		}
 	}
 
@@ -124,8 +124,8 @@
 
 	if ($type = "sendmsg") {
 		$message = mysql_real_escape_string($_REQUEST['msg']);
-		$from = "a" . (int)$_REQUEST['from'];
-		$to = "u" . (int)$_REQUEST['to'];
+		$from = "a" . mysql_real_escape_string($_REQUEST['from']);
+		$to = "u" . mysql_real_escape_string($_REQUEST['to']);
 		$published = (int)$_REQUEST['published'];
 		$img1 = mysql_real_escape_string($_REQUEST['img1']);
 		$img2 = mysql_real_escape_string($_REQUEST['img2']);
@@ -138,7 +138,7 @@
 		$img9 = mysql_real_escape_string($_REQUEST['img9']);
 		$img10 = mysql_real_escape_string($_REQUEST['img10']);
 
-		if ((int)$_REQUEST['to'] > 0) {
+		if ($_REQUEST['to'] > 0) {
 			$query = "INSERT INTO `messages` (`id`, `to`, `from`, `message`, `timestamp`, `img1`, `img2`, `img3`, `img4`, `img5`, `img6`, `img7`, `img8`, `img9`, `img10`) VALUES (NULL, '$to', '$from', '$message', CURRENT_TIMESTAMP, '$img1', '$img2', '$img3', '$img4', '$img5', '$img6', '$img7', '$img8', '$img9', '$img10')";
 			mysql_query($query) OR DIE("Didn't work.");
 			$insertid = mysql_insert_id();
@@ -152,7 +152,7 @@
 	}
 
 	if ($type = "sendreminder") {
-		$mid = (int)$_REQUEST['mid'];
+		$mid = mysql_real_escape_string($_REQUEST['mid']);
 		$query = "SELECT m.id as 'mid', m.reminders as 'reminders', SUBSTR(m.to, 2) AS 'to', CONCAT(u.first, ' ', u.last) as 'name', CONCAT(a.first, ' ', a.last) as 'adminname', a.email as 'adminemail', u.email as 'email' FROM `messages` as m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` as a ON SUBSTR(m.from, 2) = a.id WHERE m.id LIKE $mid";
 		$result = mysql_query($query);
 		while($line = mysql_fetch_array($result)) {
@@ -161,10 +161,9 @@
 			$from = $line["adminname"] . "<$line[adminemail]>";
 			// $headers = "From:" . $from;
 
-			$headers = "From: " . $from . "\n";
-			$headers .= "Reply-To: ". $line['adminemail'] . "\n";
-			$headers = "MIME-Version: 1.0" . "\n";
-			$headers .= "Content-type:text/html;charset=iso-8859-1" . "\n";
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			$headers .= "From: Michigan Engineering <engcom@engin.umich.edu> \n";
 
 			mail($line["email"],$subject,$message,$headers);
 			$rem = $line["reminders"] + 2;

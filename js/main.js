@@ -32,7 +32,7 @@ function putMessage(e, that){
 	// console.log("Parent: ", $parent);
 	var files = Array(), data = Object();
 
-	data["type"] = "sendmsg", data["from"] = from, data["to"] = to, data["msg"] = msg, data["published"] = published;
+	data["type"] = "sendmsg", data["from"] = from, data["to"] = String(to), data["msg"] = msg, data["published"] = published;
 
 	// { type: "sendmsg", from: from, to: to, msg: msg, published: published }
 
@@ -208,7 +208,7 @@ function bindEditStuff(numberOfEntries) {
 	$("li.selectall a").on("click", function(e){
 		e.preventDefault();
 		$this = $(this), $parent = $this.parent().parent();
-		$parent.find(".masonry5 input[type='checkbox']").each(function(){
+		$parent.find("input[type='checkbox']").each(function(){
 
 			if (!$(this).attr("disabled") && !$(this).prop("checked")) {
 				// console.log($(this).attr("checked"));
@@ -222,14 +222,14 @@ function bindEditStuff(numberOfEntries) {
 	// Bind the clicking of a checkbox  //
 	///////////////////////////////////////
 
-	$(".masonry5 input[type='checkbox']").on("click", function(e){
+	$(".cats input[type='checkbox']").on("click", function(e){
 		// e.preventDefault();
 		$this = $(this);
 		$form = $($this.closest("form")[0]);
 		$li = $form.parent();
 		$hidden = $($form.find("input[name='categories']")[0]);
 		var cats = "";
-		$form.find(".masonry5 input[type='checkbox']").each(function(){
+		$form.find("input[type='checkbox']").each(function(){
 			$that = $(this);
 			if ($that.is(":checked")) cats += $that.attr("value") + ",";
 		});
@@ -394,7 +394,7 @@ function bindEditStuff(numberOfEntries) {
 }
 
 function deactivateCheckboxes() {
-	$(".masonry5 li input[type='checkbox']").each(function(){
+	$(".cats li input[type='checkbox']").each(function(){
 		$this = $(this);
 		// console.log($this.attr("value"));
 		if (existingCats.indexOf($this.attr("value")) == -1) {
@@ -407,7 +407,7 @@ function deactivateCheckboxes() {
 			$label.on("click", function(e){
 				e.preventDefault();
 				$this = $(this);
-				$this.parent().find(".masonry5 input[type='checkbox']").click();
+				$this.parent().find("input[type='checkbox']").click();
 			});
 
 		}

@@ -4,6 +4,19 @@
     ///////////////
     // if ($_SERVER['REMOTE_USER'] == "") $_SERVER['REMOTE_USER'] == 'tkdman';
 
+    class MyDateTime extends DateTime
+    {
+        public static function createFromFormat($format, $time, $timezone = null)
+        {
+            if(!$timezone) $timezone = new DateTimeZone(date_default_timezone_get());
+            $version = explode('.', phpversion());
+            if(((int)$version[0] >= 5 && (int)$version[1] >= 2 && (int)$version[2] > 17)){
+                return parent::createFromFormat($format, $time, $timezone);
+            }
+            return new DateTime(date($format, strtotime($time)), $timezone);
+        }
+    }
+
     if (!extension_loaded('json')) {
             dl('json.so');  
     }
@@ -128,7 +141,7 @@
 
                     ?>
                         
-                            <li class="users" id="<?= $id?>"><a class="user" href="#" data-id="<?= $id ?>" data-type="edit"><?= $name?></a>
+                            <li class="users" id="<?= $id?>"><a class="user" href="#" data-id="<?= $id ?>" data-type="edit"><?= $name?></a> (<a href="http://victors.engin.umich.edu/preview.php?user=<?= $id?>">Preview</a>)
                                 <div class="msg"><? 
                                     if ($line['showreplied'] == 1) { ?>
                                     <span style='color: #866DAB'>Prospect has replied to message [<a href="#" class="hidereplied">x</a>]</span><?}
@@ -154,7 +167,7 @@
 
                                     <h2 class="cats">Categories</h2>
                                     
-                                    <div class="masonry<?= $i?>">
+                                    <div class="cats masonry<?= $i?>">
 
                                         <ul class="topic">
                                             <h3><a href="#" class="subtopic">Transportation Innovations</a></h3> 
@@ -283,7 +296,6 @@
                                             <li><input type="checkbox" name="gradexperience" value="gradexperience"<? if (in_array("gradexperience", $cats)) echo " checked";?>><label for="gradexperience">Grad Student Experience</label></li>
                                             <li><input type="checkbox" name="hoexperience" value="hoexperience"<? if (in_array("hoexperience", $cats)) echo " checked";?>><label for="hoexperience">Hands-on Experience</label></li>
                                             <li><input type="checkbox" name="multidisc" value="multidisc"<? if (in_array("multidisc", $cats)) echo " checked";?>><label for="multidisc">Multidisciplinary Efforts</label></li>
-                                            <li><input type="checkbox" name="teams" value="teams"<? if (in_array("teams", $cats)) echo " checked";?>><label for="teams">Teams</label></li>
                                             <li><input type="checkbox" name="extracurr" value="extracurr"<? if (in_array("extracurr", $cats)) echo " checked";?>><label for="extracurr">Extracurricular</label></li>
                                             <li><input type="checkbox" name="studentstories" value="studentstories"<? if (in_array("studentstories", $cats)) echo " checked";?>><label for="studentstories">Student Stories</label></li>
                                             <li><input type="checkbox" name="nostalgia" value="nostalgia"<? if (in_array("nostalgia", $cats)) echo " checked";?>><label for="nostalgia">Nostalgia & Pride</label></li>
@@ -373,7 +385,7 @@
 
                                         ?>
                                     </select> <br />
-									<label>Message Slice</label><input type="checkbox" name="msgslice" <? if($msgslice==='0') echo "checked value='0'" ?>><label style="float:none;"> Show the message slice.</label><br />
+									<br />
 
                                     <input type="hidden" name="individuals" value="<?= $individuals?>"><br>
 
@@ -398,7 +410,7 @@
 
 
                                     <h2>Messages to prospect</h2>
-
+                                    <input type="checkbox" name="msgslice" <? if($msgslice==='0') echo "checked value='0'" ?>><label style="float:none;"> Show the message slice.</label>
                                     <div class="messages">
                                     
                                     <? 
@@ -438,11 +450,12 @@
                                         }
 										
 										// check the time interval
-										if(isset($line2['remindertime'])&&$line2['remindertime']!=NULL&&$line2['remindertime']!=''){
+										if(isset($line2['remindertime'])&&$line2['remindertime']!=NULL&&$line2['remindertime']!='')
+                                        {
 											date_default_timezone_set('America/Detroit');
 											$current_date = new DateTime();
-											$last_reminder = DateTime::createFromFormat('Y-m-d H:i:s',$line2["remindertime"]);
-											$interval = $current_date->diff($last_reminder)->days;
+											// $last_reminder = MyDateTime::createFromFormat('Y-m-d H:i:s',$line2["remindertime"]);
+                                            // $interval = $current_date->diff($last_reminder)->days;
 										}else{
 											$interval = 1;
 										}
@@ -459,11 +472,14 @@
                                             <? } $hasimages = false;?>
 
                                             <? if ($line2["from"] == $aid) { ?>
-												<?if ($interval > 0) {?> 
-                                            		<span class="sendemail">(<a href="#" data-mid="<?= $line2['mid']?>">Send email notification (<?= $line2["reminders"] + 1?>)</a>)</span>
-												<?}else{?>
-													<span class="sendemail">Reminder sent. Please wait 24 hours before sending again.</span>
-												<? }?>
+												
+
+                                            		<span class="sendemail">(<a href="#" data-mid="<?= $line2['mid']?>">Send email notification (<?= $line2["reminders"] + 1?>)</a>)</span><br />
+                                                    <span>Last notification sent: <?= $line2["timestamp"]?></span>
+
+												
+													<!--span class="sendemail">Reminder sent. Please wait 24 hours before sending again.</span-->
+												
                                             <? } ?>
 
                                         </div>

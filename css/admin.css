@@ -76,7 +76,7 @@ li.users {
     list-style: none;
     margin: 0;
     background-color: #FDD54F;
-    overflow: hidden;
+    overflow: visible;
     padding: 2px 7px;
 }
 
