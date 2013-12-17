@@ -78,6 +78,22 @@ function putMessage(e, that){
 	}
 }
 
+function removeMsgImage(that){
+	var filename = $(that).attr('filename');
+	if($('input[value="'+filename+'"]')){
+		$('input[value="'+filename+'"]').remove();
+		$.ajax({
+			type:"POST",
+			url: "dostuff.php",
+			data:{type:"imgremove", filename:filename},
+			success:function(response){
+				//console.log(response);
+			}
+		})
+	}
+	$(that).parent().remove();
+}
+
 var numfiles = 0, imagefiles = Array();
 
 function bindEditStuff(numberOfEntries) {
@@ -144,7 +160,7 @@ function bindEditStuff(numberOfEntries) {
 
 		uploader[k].bind('FilesAdded', function(up, files) {
 			$.each(files, function(k, v){
-				filelist.append('<div id="' + v.id + '">' + files[k].name + ' (' + plupload.formatSize(files[k].size) + ') <b></b></div>');
+				filelist.append('<div id="' + v.id + '">' + files[k].name + ' (' + plupload.formatSize(files[k].size) + ') <b></b><a style="float:right" filename="'+files[k].name+'" onclick="javascript:removeMsgImage(this)">[Remove]</a></div>');
 			});
 		});
 

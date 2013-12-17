@@ -29,7 +29,16 @@
 	$sidebar = mysql_real_escape_string($_REQUEST["sidebar"]);
 	$mailimg = mysql_real_escape_string($_REQUEST["mailimg"]);
 	$msgslice = mysql_real_escape_string($_REQUEST["msgslice"]);
-
+	
+	
+	if($type == "imgremove"){
+		$result = unlink(UPLOADPATH . $_REQUEST['filename']);
+		if($result){
+  		  echo "Successfully removed";         
+  		} else {
+  		  echo "Not uploaded";
+  		}
+	}
 
 	if ($type == "hideviewed") {
 		$query = "UPDATE `users` SET `showviewed` = '0' WHERE `id` = '$id'";
