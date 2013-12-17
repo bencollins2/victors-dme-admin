@@ -414,7 +414,7 @@
                                     <div class="messages">
                                     
                                     <? 
-                                        $query2 = "SELECT m.id as mid, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2) AS 'to', m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(a.first, ' ', a.last) AS fromName, CONCAT(u.first, ' ', u.last) AS toName, m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.from, 2) = a.id WHERE SUBSTR(m.to, 2) LIKE '$id' AND SUBSTR(m.from, 2) LIKE '$aid' UNION SELECT m.id, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2), m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(u.first, ' ', u.last), CONCAT(a.first, ' ', a.last), m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.from, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.to, 2) = a.id WHERE SUBSTR(m.from, 2) LIKE '$id' AND SUBSTR(m.to, 2) LIKE '$aid' ORDER BY `timestamp` ASC";
+                                        $query2 = "SELECT m.id as mid, m.published as published, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2) AS 'to', m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(a.first, ' ', a.last) AS fromName, CONCAT(u.first, ' ', u.last) AS toName, m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.to, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.from, 2) = a.id WHERE SUBSTR(m.to, 2) LIKE '$id' AND SUBSTR(m.from, 2) LIKE '$aid' AND published = 1 UNION SELECT m.id, m.published as published, SUBSTR(m.from, 2) AS 'from', SUBSTR(m.to, 2), m.message, m.timestamp, m.img1, m.img2, m.img3, m.img4, m.img5, m.img6, m.img7, m.img8, m.img9, m.img10, u.id, CONCAT(u.first, ' ', u.last), CONCAT(a.first, ' ', a.last), m.reminders as reminders, m.remindertime FROM `messages` AS m INNER JOIN `users` AS u ON SUBSTR(m.from, 2) = u.id INNER JOIN `adminusers` AS a ON SUBSTR(m.to, 2) = a.id WHERE SUBSTR(m.from, 2) LIKE '$id' AND SUBSTR(m.to, 2) LIKE '$aid' AND published = 1 ORDER BY `timestamp` ASC";
 
                                         $unread = "";
                                         $result2 = mysql_query($query2);
@@ -475,7 +475,10 @@
 												
 
                                             		<span class="sendemail">(<a href="#" data-mid="<?= $line2['mid']?>">Send email notification (<?= $line2["reminders"] + 1?>)</a>)</span><br />
-                                                    <span>Last notification sent: <?= $line2["timestamp"]?></span>
+                                                    <? if(isset($line2['remindertime'])&&$line2['remindertime']!=NULL&&$line2['remindertime']!='')
+                                                         { ?>
+                                                    <span>Last notification sent: <?= $line2["remindertime"]?></span>
+                                                    <? } ?>
 
 												
 													<!--span class="sendemail">Reminder sent. Please wait 24 hours before sending again.</span-->

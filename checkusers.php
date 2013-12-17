@@ -6,7 +6,7 @@
 
     require("../db_campaign.php");
 
-    $query = "SELECT * FROM `users` WHERE id > 2000000000";
+    $query = "SELECT * FROM `users`, `adminusers` WHERE id > 2000000000";
     $result = mysql_query($query);
     while($line = mysql_fetch_array($result)) {
         $myvalue = $line["name"];

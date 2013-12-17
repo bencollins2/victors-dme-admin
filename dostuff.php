@@ -139,7 +139,7 @@
 		$img10 = mysql_real_escape_string($_REQUEST['img10']);
 
 		if ($_REQUEST['to'] > 0) {
-			$query = "INSERT INTO `messages` (`id`, `to`, `from`, `message`, `timestamp`, `img1`, `img2`, `img3`, `img4`, `img5`, `img6`, `img7`, `img8`, `img9`, `img10`) VALUES (NULL, '$to', '$from', '$message', CURRENT_TIMESTAMP, '$img1', '$img2', '$img3', '$img4', '$img5', '$img6', '$img7', '$img8', '$img9', '$img10')";
+			$query = "INSERT INTO `messages` (`id`, `to`, `from`, `message`, `timestamp`, `img1`, `img2`, `img3`, `img4`, `img5`, `img6`, `img7`, `img8`, `img9`, `img10`, `published`) VALUES (NULL, '$to', '$from', '$message', CURRENT_TIMESTAMP, '$img1', '$img2', '$img3', '$img4', '$img5', '$img6', '$img7', '$img8', '$img9', '$img10', '$published')";
 			mysql_query($query) OR DIE("Didn't work.");
 			$insertid = mysql_insert_id();
 			$query = "SELECT `timestamp`, `id` FROM messages WHERE id LIKE $insertid LIMIT 0,1";

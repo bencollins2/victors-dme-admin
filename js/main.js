@@ -27,6 +27,7 @@ function progressHandlingFunction() {
 }
 
 function putMessage(e, that){
+	debugger;
 	e.preventDefault();
 	$this = $(that), $parent = $this.parent(), from = $this.data("from"), to = $this.data("to"), msg = tinymce.activeEditor.getContent(), fromname = $this.data("fromname"), published = $this.data("publish"), $form = $parent.parent().parent()[0], fd = new FormData($form);
 	// console.log("Parent: ", $parent);
